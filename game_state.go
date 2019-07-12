@@ -1,8 +1,8 @@
 package demoinfocs
 
 import (
-	"github.com/markus-wa/demoinfocs-golang/common"
-	st "github.com/markus-wa/demoinfocs-golang/sendtables"
+	"github.com/faceit/demoinfocs-golang/common"
+	st "github.com/faceit/demoinfocs-golang/sendtables"
 )
 
 //go:generate ifacemaker -f game_state.go -s GameState -i IGameState -p demoinfocs -D -y "IGameState is an auto-generated interface for GameState." -c "DO NOT EDIT: Auto generated" -o game_state_interface.go
@@ -154,7 +154,7 @@ func (ptcp Participants) ByUserID() map[int]*common.Player {
 	res := make(map[int]*common.Player)
 	for k, v := range ptcp.playersByUserID {
 		// We need to check if the player entity hasn't been destroyed yet
-		// See https://github.com/markus-wa/demoinfocs-golang/issues/98
+		// See https://github.com/faceit/demoinfocs-golang/issues/98
 		if v.IsConnected && v.Entity != nil {
 			res[k] = v
 		}

@@ -1,6 +1,6 @@
 # Mocking the parser
 
-This example shows you how to use the provided [`fake` package](https://godoc.org/github.com/markus-wa/demoinfocs-golang/fake) to mock `demoinfocs.IParser` and other parts of the library.
+This example shows you how to use the provided [`fake` package](https://godoc.org/github.com/faceit/demoinfocs-golang/fake) to mock `demoinfocs.IParser` and other parts of the library.
 That way you will be able to write useful unit tests for your application.
 
 ## System under test
@@ -9,8 +9,8 @@ First, let's have a look at the API of our code, the 'system under test':
 
 ```go
 import (
-	dem "github.com/markus-wa/demoinfocs-golang"
-	events "github.com/markus-wa/demoinfocs-golang/events"
+	dem "github.com/faceit/demoinfocs-golang"
+	events "github.com/faceit/demoinfocs-golang/events"
 )
 
 func collectKills(parser dem.IParser) (kills []events.Kill, err error) {
@@ -33,9 +33,9 @@ import (
 
 	assert "github.com/stretchr/testify/assert"
 
-	common "github.com/markus-wa/demoinfocs-golang/common"
-	events "github.com/markus-wa/demoinfocs-golang/events"
-	fake "github.com/markus-wa/demoinfocs-golang/fake"
+	common "github.com/faceit/demoinfocs-golang/common"
+	events "github.com/faceit/demoinfocs-golang/events"
+	fake "github.com/faceit/demoinfocs-golang/fake"
 )
 
 func TestCollectKills(t *testing.T) {
@@ -83,9 +83,9 @@ import (
 
 	assert "github.com/stretchr/testify/assert"
 
-	common "github.com/markus-wa/demoinfocs-golang/common"
-	events "github.com/markus-wa/demoinfocs-golang/events"
-	fake "github.com/markus-wa/demoinfocs-golang/fake"
+	common "github.com/faceit/demoinfocs-golang/common"
+	events "github.com/faceit/demoinfocs-golang/events"
+	fake "github.com/faceit/demoinfocs-golang/fake"
 )
 
 func TestCollectKillsError(t *testing.T) {

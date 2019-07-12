@@ -3,10 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
-	dem "github.com/markus-wa/demoinfocs-golang"
-	"github.com/markus-wa/demoinfocs-golang/common"
-	"github.com/markus-wa/demoinfocs-golang/events"
-	ex "github.com/markus-wa/demoinfocs-golang/examples"
+	dem "github.com/faceit/demoinfocs-golang"
+	"github.com/faceit/demoinfocs-golang/common"
+	ex "github.com/faceit/demoinfocs-golang/examples"
 	"io/ioutil"
 	"os"
 )
@@ -18,7 +17,7 @@ func main() {
 	checkError(err)
 
 	var buf bytes.Buffer
-	mr := &teeReader{r: f, w: &buf}
+	mr := common.NewStoppableReader(f, &buf)
 	mr.Begin()
 
 	p := dem.NewParser(mr)
@@ -28,25 +27,12 @@ func main() {
 	checkError(err)
 	fmt.Println("Map:", header.MapName)
 
-	first := true
-
-	// Register handler on round end to figure out who won
-	p.RegisterEventHandler(func(event events.RoundEnd) {
-		if first {
-			gs := p.GameState()
-			fmt.Printf("got event roundendofficial at tick %d", gs.IngameTick())
-			fmt.Println()
-			mr.End()
-			first = false
-		}
-	})
-
 	// Parse to end
 	err = p.ParseToEnd()
 	checkError(err)
 
 	fmt.Printf("got %d bytes", buf.Len())
-	err = ioutil.WriteFile("singleround.dem", buf.Bytes(), 777)
+	err = ioutil.WriteFile("../../cs-demos/round.dem", buf.Bytes(), 777)
 	checkError(err)
 }
 

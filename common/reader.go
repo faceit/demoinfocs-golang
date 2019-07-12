@@ -1,14 +1,23 @@
-package main
+package common
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 // TeeReader returns a Reader that writes to w what it reads from r.
 // All reads from r performed through it are matched with
 // corresponding writes to w. There is no internal buffering -
 // the write must complete before the read completes.
 // Any error encountered while writing is reported as a read error.
-func MagicReader(r io.Reader, w io.Writer) io.Reader {
+func NewStoppableReader(r io.Reader, w io.Writer) StoppableReader {
 	return &teeReader{r: r, w: w}
+}
+
+type StoppableReader interface {
+	io.Reader
+	Begin()
+	End()
 }
 
 type teeReader struct {
@@ -28,9 +37,15 @@ func (t *teeReader) Read(p []byte) (n int, err error) {
 }
 
 func (t *teeReader) Begin() {
+	if !t.read {
+		fmt.Println("started reading")
+	}
 	t.read = true
 }
 
 func (t *teeReader) End() {
+	if t.read {
+		fmt.Println("stopped reading")
+	}
 	t.read = false
 }

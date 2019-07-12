@@ -1,7 +1,6 @@
 package demoinfocs
 
 import (
-	"io"
 	"sync"
 	"time"
 
@@ -9,10 +8,10 @@ import (
 	"github.com/golang/geo/r3"
 	dp "github.com/markus-wa/godispatch"
 
-	bit "github.com/markus-wa/demoinfocs-golang/bitread"
-	"github.com/markus-wa/demoinfocs-golang/common"
-	"github.com/markus-wa/demoinfocs-golang/msg"
-	st "github.com/markus-wa/demoinfocs-golang/sendtables"
+	bit "github.com/faceit/demoinfocs-golang/bitread"
+	"github.com/faceit/demoinfocs-golang/common"
+	"github.com/faceit/demoinfocs-golang/msg"
+	st "github.com/faceit/demoinfocs-golang/sendtables"
 )
 
 //go:generate ifacemaker -f parser.go -f parsing.go -s Parser -i IParser -p demoinfocs -D -y "IParser is an auto-generated interface for Parser, intended to be used when mockability is needed." -c "DO NOT EDIT: Auto generated" -o parser_interface.go
@@ -43,6 +42,7 @@ Prints out '{A/B} site went BOOM!' when a bomb explodes.
 type Parser struct {
 	// Important fields
 
+	underlying                   common.StoppableReader
 	bitReader                    *bit.BitReader
 	stParser                     *st.SendTableParser
 	additionalNetMessageCreators map[int]NetMessageCreator // Map of net-message-IDs to NetMessageCreators (for parsing custom net-messages)
@@ -73,6 +73,14 @@ type Parser struct {
 	grenadeModelIndices  map[int]common.EquipmentElement                 // Used to map model indices to grenades (used for grenade projectiles)
 	stringTables         []*msg.CSVCMsg_CreateStringTable                // Contains all created sendtables, needed when updating them
 	delayedEvents        []interface{}                                   // Contains events that need to be dispatched at the end of a tick (e.g. flash events because FlashDuration isn't updated before that)
+}
+
+func (p *Parser) BeginWriting() {
+	p.underlying.Begin()
+}
+
+func (p *Parser) StopWriting() {
+	p.underlying.End()
 }
 
 // NetMessageCreator creates additional net-messages to be dispatched to net-message handlers.
@@ -199,7 +207,7 @@ func (p *Parser) setError(err error) {
 // The demostream io.Reader (e.g. os.File or bytes.Reader) must provide demo data in the '.DEM' format.
 //
 // See also: NewCustomParser() & DefaultParserConfig
-func NewParser(demostream io.Reader) *Parser {
+func NewParser(demostream common.StoppableReader) *Parser {
 	return NewParserWithConfig(demostream, DefaultParserConfig)
 }
 
@@ -230,10 +238,11 @@ var DefaultParserConfig = ParserConfig{
 // NewParserWithConfig returns a new Parser with a custom configuration.
 //
 // See also: NewParser() & ParserConfig
-func NewParserWithConfig(demostream io.Reader, config ParserConfig) *Parser {
+func NewParserWithConfig(demostream common.StoppableReader, config ParserConfig) *Parser {
 	var p Parser
 
 	// Init parser
+	p.underlying = demostream
 	p.bitReader = bit.NewLargeBitReader(demostream)
 	p.stParser = st.NewSendTableParser()
 	p.equipmentMapping = make(map[*st.ServerClass]common.EquipmentElement)

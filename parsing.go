@@ -9,9 +9,9 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/markus-wa/demoinfocs-golang/common"
-	"github.com/markus-wa/demoinfocs-golang/events"
-	"github.com/markus-wa/demoinfocs-golang/msg"
+	"github.com/faceit/demoinfocs-golang/common"
+	"github.com/faceit/demoinfocs-golang/events"
+	"github.com/faceit/demoinfocs-golang/msg"
 )
 
 const maxOsPath = 260
@@ -322,6 +322,16 @@ func (p *Parser) parsePacket() {
 			// TODO: Don't crash here, happens with demos that work in gotv
 			panic(fmt.Sprintf("Failed to unmarshal cmd %d", cmd))
 		}
+
+		switch e := m.(type) {
+		case *msg.CSVCMsg_GameEvent:
+			if e.GetEventid() == 43 {
+				fmt.Printf("round end at tick %d", p.gameState.IngameTick())
+				fmt.Println()
+				p.StopWriting()
+			}
+		}
+
 		p.msgQueue <- m
 
 		// Reset length to 0 and pool

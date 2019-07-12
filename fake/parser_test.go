@@ -6,10 +6,10 @@ import (
 
 	assert "github.com/stretchr/testify/assert"
 
-	common "github.com/markus-wa/demoinfocs-golang/common"
-	events "github.com/markus-wa/demoinfocs-golang/events"
-	fake "github.com/markus-wa/demoinfocs-golang/fake"
-	msg "github.com/markus-wa/demoinfocs-golang/msg"
+	common "github.com/faceit/demoinfocs-golang/common"
+	events "github.com/faceit/demoinfocs-golang/events"
+	fake "github.com/faceit/demoinfocs-golang/fake"
+	msg "github.com/faceit/demoinfocs-golang/msg"
 )
 
 func TestParseHeader(t *testing.T) {

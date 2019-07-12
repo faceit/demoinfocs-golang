@@ -6,9 +6,9 @@ import (
 
 	proto "github.com/gogo/protobuf/proto"
 
-	dem "github.com/markus-wa/demoinfocs-golang"
-	ex "github.com/markus-wa/demoinfocs-golang/examples"
-	msg "github.com/markus-wa/demoinfocs-golang/msg"
+	dem "github.com/faceit/demoinfocs-golang"
+	ex "github.com/faceit/demoinfocs-golang/examples"
+	msg "github.com/faceit/demoinfocs-golang/msg"
 )
 
 // Run like this: go run netmessages.go -demo /path/to/demo.dem > out.png

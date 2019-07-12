@@ -3,8 +3,8 @@ package common
 import (
 	"time"
 
+	st "github.com/faceit/demoinfocs-golang/sendtables"
 	"github.com/golang/geo/r3"
-	st "github.com/markus-wa/demoinfocs-golang/sendtables"
 )
 
 // Player contains mostly game-relevant player information.

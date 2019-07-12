@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang/geo/r3"
 
-	"github.com/markus-wa/demoinfocs-golang/common"
-	"github.com/markus-wa/demoinfocs-golang/msg"
+	"github.com/faceit/demoinfocs-golang/common"
+	"github.com/faceit/demoinfocs-golang/msg"
 )
 
 // TickDone is deprecated, use the identical FrameDone event instead.

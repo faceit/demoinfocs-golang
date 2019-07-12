@@ -2,10 +2,10 @@
 
 Is a Go library for super fast parsing and analysing of Counter Strike: Global Offensive (CS:GO) demos (aka replays). It is based on <a href="https://github.com/ValveSoftware/csgo-demoinfo" rel="external">Valve's demoinfogo</a> and <a href="https://github.com/StatsHelix/demoinfo" rel="external">SatsHelix's demoinfo</a>.
 
-[![GoDoc](https://godoc.org/github.com/markus-wa/demoinfocs-golang?status.svg)](https://godoc.org/github.com/markus-wa/demoinfocs-golang)
-[![Build Status](https://travis-ci.org/markus-wa/demoinfocs-golang.svg?branch=master)](https://travis-ci.org/markus-wa/demoinfocs-golang)
-[![codecov](https://codecov.io/gh/markus-wa/demoinfocs-golang/branch/master/graph/badge.svg)](https://codecov.io/gh/markus-wa/demoinfocs-golang)
-[![Go Report](https://goreportcard.com/badge/github.com/markus-wa/demoinfocs-golang)](https://goreportcard.com/report/github.com/markus-wa/demoinfocs-golang)
+[![GoDoc](https://godoc.org/github.com/faceit/demoinfocs-golang?status.svg)](https://godoc.org/github.com/faceit/demoinfocs-golang)
+[![Build Status](https://travis-ci.org/faceit/demoinfocs-golang.svg?branch=master)](https://travis-ci.org/faceit/demoinfocs-golang)
+[![codecov](https://codecov.io/gh/faceit/demoinfocs-golang/branch/master/graph/badge.svg)](https://codecov.io/gh/faceit/demoinfocs-golang)
+[![Go Report](https://goreportcard.com/badge/github.com/faceit/demoinfocs-golang)](https://goreportcard.com/report/github.com/faceit/demoinfocs-golang)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmarkus-wa%2Fdemoinfocs-golang.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmarkus-wa%2Fdemoinfocs-golang?ref=badge_shield)
 
@@ -20,20 +20,20 @@ You can use gitter to ask questions and discuss ideas about this project.
 This library is intended to be used with `go 1.11` or higher as it is built using Go modules.
 
 It's recommended to use modules for consumers as well if possible.
-If you are unfamiliar with Go modules there's a [list of recommended resources](https://github.com/markus-wa/demoinfocs-golang/wiki/Go-Modules#recommended-links--articles) in the wiki.
+If you are unfamiliar with Go modules there's a [list of recommended resources](https://github.com/faceit/demoinfocs-golang/wiki/Go-Modules#recommended-links--articles) in the wiki.
 
 ## Go Get
 
-	go get -u github.com/markus-wa/demoinfocs-golang
+	go get -u github.com/faceit/demoinfocs-golang
 
-If you are using a older (`v0.x`) version of the library, check out the [`v0.5` branch](https://github.com/markus-wa/demoinfocs-golang/tree/v0.5). However, it's highly recommended to switch to master (v1.0.0), which contains many new features and improvements. It also promises compatibility with new relases for the foreseeable future.
+If you are using a older (`v0.x`) version of the library, check out the [`v0.5` branch](https://github.com/faceit/demoinfocs-golang/tree/v0.5). However, it's highly recommended to switch to master (v1.0.0), which contains many new features and improvements. It also promises compatibility with new relases for the foreseeable future.
 
 ## Example
 
 This is a simple example on how to handle game events using this library.
-It prints all kills in a given demo (killer, weapon, victim, was it a wallbang/headshot?) by registering a handler for [`events.Kill`](https://godoc.org/github.com/markus-wa/demoinfocs-golang/events#Kill).
+It prints all kills in a given demo (killer, weapon, victim, was it a wallbang/headshot?) by registering a handler for [`events.Kill`](https://godoc.org/github.com/faceit/demoinfocs-golang/events#Kill).
 
-Check out the [godoc of the `events` package](https://godoc.org/github.com/markus-wa/demoinfocs-golang/events) for some information about the other available events and their purpose.
+Check out the [godoc of the `events` package](https://godoc.org/github.com/faceit/demoinfocs-golang/events) for some information about the other available events and their purpose.
 
 ```go
 package main
@@ -42,8 +42,8 @@ import (
 	"fmt"
 	"os"
 
-	dem "github.com/markus-wa/demoinfocs-golang"
-	events "github.com/markus-wa/demoinfocs-golang/events"
+	dem "github.com/faceit/demoinfocs-golang"
+	events "github.com/faceit/demoinfocs-golang/events"
 )
 
 // Run like this: go run print_kills.go
@@ -96,16 +96,16 @@ keev <AWP (HS) (WB)> to1nou
 
 Check out the [examples](examples) folder for more examples, like [how to generate heatmaps](examples/heatmap) like this one:
 
-<img alt="sample heatmap" src="https://raw.githubusercontent.com/markus-wa/demoinfocs-golang/master/examples/heatmap/heatmap.jpg" width="50%">
+<img alt="sample heatmap" src="https://raw.githubusercontent.com/faceit/demoinfocs-golang/master/examples/heatmap/heatmap.jpg" width="50%">
 
 ## Features
 
-* Game events (kills, shots, round starts/ends, footsteps etc.) - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang/events) / [example](https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/print-events)
-* Tracking of game-state (players, teams, grenades etc.) - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang#GameState)
-* Grenade projectiles / trajectories - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang#GameState.GrenadeProjectiles) / [example](https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/nade-trajectories)
-* Access to entities, server-classes & data-tables - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang/sendtables#ServerClasses) / [example](https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/entities)
-* Access to all net-messages - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang#NetMessageCreator) / [example](https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/net-messages)
-* Chat & console messages <sup id="achat1">1</sup> - [docs](https://godoc.org/github.com/markus-wa/demoinfocs-golang/events#ChatMessage) / [example](https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/print-events)
+* Game events (kills, shots, round starts/ends, footsteps etc.) - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang/events) / [example](https://github.com/faceit/demoinfocs-golang/tree/master/examples/print-events)
+* Tracking of game-state (players, teams, grenades etc.) - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang#GameState)
+* Grenade projectiles / trajectories - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang#GameState.GrenadeProjectiles) / [example](https://github.com/faceit/demoinfocs-golang/tree/master/examples/nade-trajectories)
+* Access to entities, server-classes & data-tables - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang/sendtables#ServerClasses) / [example](https://github.com/faceit/demoinfocs-golang/tree/master/examples/entities)
+* Access to all net-messages - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang#NetMessageCreator) / [example](https://github.com/faceit/demoinfocs-golang/tree/master/examples/net-messages)
+* Chat & console messages <sup id="achat1">1</sup> - [docs](https://godoc.org/github.com/faceit/demoinfocs-golang/events#ChatMessage) / [example](https://github.com/faceit/demoinfocs-golang/tree/master/examples/print-events)
 * [Easy debugging via build-flags](#debugging)
 * Built with performance & concurrency in mind
 
@@ -133,7 +133,7 @@ Here are some benchmark results from a system with an Intel i7 2600k CPU and a S
 $ go test -run _NONE_ -bench . -benchtime 30s -benchmem -concurrentdemos 8
 goos: windows
 goarch: amd64
-pkg: github.com/markus-wa/demoinfocs-golang
+pkg: github.com/faceit/demoinfocs-golang
 BenchmarkDemoInfoCs-8             30    1237133300 ns/op    256055133 B/op    879104 allocs/op
 BenchmarkInMemory-8               30    1216333013 ns/op    255900492 B/op    878900 allocs/op
 BenchmarkConcurrent-8             20    2840799900 ns/op    2046866843 B/op  7031208 allocs/op
@@ -142,12 +142,12 @@ BenchmarkConcurrent-8             20    2840799900 ns/op    2046866843 B/op  703
     demoinfocs_test.go:369: Running concurrency benchmark with 8 demos
     demoinfocs_test.go:369: Running concurrency benchmark with 8 demos
 PASS
-ok      github.com/markus-wa/demoinfocs-golang  165.244s
+ok      github.com/faceit/demoinfocs-golang  165.244s
 ```
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/markus-wa/demoinfocs-golang/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/faceit/demoinfocs-golang/tags).
 There is one caveat however: Beta features - which are marked as such via comments and in release notes - may change in minor releases.
 
 It's recommended to use some kind of dependency management system such as [dep](https://github.com/golang/dep) to ensure reproducible builds.
@@ -179,7 +179,7 @@ Here's a cool [gist of a pre-commit hook](https://gist.github.com/micvbang/4c8cb
 You can use the build tag `debugdemoinfocs` (i.e. `go test -tags debugdemoinfocs -v`) to print out debugging information - such as game events or unhandled demo-messages - during the parsing process.<br>
 Side-note: The tag isn't called `debug` to avoid naming conflicts with other libs (and underscores in tags don't work, apparently).
 
-To change the default debugging behavior, Go's `ldflags` parameter can be used. Example for additionally printing out all server-classes with their properties: `-ldflags '-X github.com/markus-wa/demoinfocs-golang.debugServerClasses=YES'`
+To change the default debugging behavior, Go's `ldflags` parameter can be used. Example for additionally printing out all server-classes with their properties: `-ldflags '-X github.com/faceit/demoinfocs-golang.debugServerClasses=YES'`
 
 Check out `debug_on.go` for any other settings that can be changed.
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/faceit/demoinfocs-golang/common"
 )
 
 func TestPlayerFlashed_FlashDuration(t *testing.T) {

@@ -5,8 +5,8 @@
 package demoinfocs
 
 import (
-	msg "github.com/markus-wa/demoinfocs-golang/msg"
-	st "github.com/markus-wa/demoinfocs-golang/sendtables"
+	msg "github.com/faceit/demoinfocs-golang/msg"
+	st "github.com/faceit/demoinfocs-golang/sendtables"
 )
 
 func debugGameEvent(descriptor *msg.CSVCMsg_GameEventListDescriptorT, ge *msg.CSVCMsg_GameEvent) {

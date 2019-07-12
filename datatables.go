@@ -6,9 +6,9 @@ import (
 
 	"github.com/golang/geo/r3"
 
-	"github.com/markus-wa/demoinfocs-golang/common"
-	"github.com/markus-wa/demoinfocs-golang/events"
-	st "github.com/markus-wa/demoinfocs-golang/sendtables"
+	"github.com/faceit/demoinfocs-golang/common"
+	"github.com/faceit/demoinfocs-golang/events"
+	st "github.com/faceit/demoinfocs-golang/sendtables"
 )
 
 const (
