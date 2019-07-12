@@ -1,13 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"os"
-
 	dem "github.com/markus-wa/demoinfocs-golang"
-	common "github.com/markus-wa/demoinfocs-golang/common"
-	events "github.com/markus-wa/demoinfocs-golang/events"
+	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/events"
 	ex "github.com/markus-wa/demoinfocs-golang/examples"
+	"io/ioutil"
+	"os"
 )
 
 // Run like this: go run print_events.go -demo /path/to/demo.dem
@@ -16,52 +17,36 @@ func main() {
 	defer f.Close()
 	checkError(err)
 
-	p := dem.NewParser(f)
+	var buf bytes.Buffer
+	mr := &teeReader{r: f, w: &buf}
+	mr.Begin()
+
+	p := dem.NewParser(mr)
 
 	// Parse header
 	header, err := p.ParseHeader()
 	checkError(err)
 	fmt.Println("Map:", header.MapName)
 
-	// Register handler on kill events
-	p.RegisterEventHandler(func(e events.Kill) {
-		var hs string
-		if e.IsHeadshot {
-			hs = " (HS)"
-		}
-		var wallBang string
-		if e.PenetratedObjects > 0 {
-			wallBang = " (WB)"
-		}
-		fmt.Printf("%s <%v%s%s> %s\n", formatPlayer(e.Killer), e.Weapon.Weapon, hs, wallBang, formatPlayer(e.Victim))
-	})
+	first := true
 
 	// Register handler on round end to figure out who won
-	p.RegisterEventHandler(func(e events.RoundEnd) {
-		gs := p.GameState()
-		switch e.Winner {
-		case common.TeamTerrorists:
-			// Winner's score + 1 because it hasn't actually been updated yet
-			fmt.Printf("Round finished: winnerSide=T  ; score=%d:%d\n", gs.TeamTerrorists().Score+1, gs.TeamCounterTerrorists().Score)
-		case common.TeamCounterTerrorists:
-			fmt.Printf("Round finished: winnerSide=CT ; score=%d:%d\n", gs.TeamCounterTerrorists().Score+1, gs.TeamTerrorists().Score)
-		default:
-			// Probably match medic or something similar
-			fmt.Println("Round finished: No winner (tie)")
+	p.RegisterEventHandler(func(event events.RoundEnd) {
+		if first {
+			gs := p.GameState()
+			fmt.Printf("got event roundendofficial at tick %d", gs.IngameTick())
+			fmt.Println()
+			mr.End()
+			first = false
 		}
-	})
-
-	// Register handler for chat messages to print them
-	p.RegisterEventHandler(func(e events.ChatMessage) {
-		fmt.Printf("Chat - %s says: %s\n", formatPlayer(e.Sender), e.Text)
-	})
-
-	p.RegisterEventHandler(func(e events.RankUpdate) {
-		fmt.Printf("Rank Update: %d went from rank %d to rank %d, change: %f\n", e.SteamID, e.RankOld, e.RankNew, e.RankChange)
 	})
 
 	// Parse to end
 	err = p.ParseToEnd()
+	checkError(err)
+
+	fmt.Printf("got %d bytes", buf.Len())
+	err = ioutil.WriteFile("singleround.dem", buf.Bytes(), 777)
 	checkError(err)
 }
 
