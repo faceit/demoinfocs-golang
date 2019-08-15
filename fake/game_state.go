@@ -3,9 +3,9 @@ package fake
 import (
 	mock "github.com/stretchr/testify/mock"
 
-	dem "github.com/faceit/demoinfocs-golang"
-	common "github.com/faceit/demoinfocs-golang/common"
-	st "github.com/faceit/demoinfocs-golang/sendtables"
+	dem "github.com/markus-wa/demoinfocs-golang"
+	common "github.com/markus-wa/demoinfocs-golang/common"
+	st "github.com/markus-wa/demoinfocs-golang/sendtables"
 )
 
 var _ dem.IGameState = new(GameState)

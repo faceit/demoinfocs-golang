@@ -1,5 +1,5 @@
 // Package fake provides basic mocks for IParser, IGameState and IParticipants.
-// See examples/mocking (https://github.com/faceit/demoinfocs-golang/tree/master/examples/mocking).
+// See examples/mocking (https://github.com/markus-wa/demoinfocs-golang/tree/master/examples/mocking).
 package fake
 
 import (
@@ -8,9 +8,9 @@ import (
 	dp "github.com/markus-wa/godispatch"
 	mock "github.com/stretchr/testify/mock"
 
-	dem "github.com/faceit/demoinfocs-golang"
-	common "github.com/faceit/demoinfocs-golang/common"
-	st "github.com/faceit/demoinfocs-golang/sendtables"
+	dem "github.com/markus-wa/demoinfocs-golang"
+	common "github.com/markus-wa/demoinfocs-golang/common"
+	st "github.com/markus-wa/demoinfocs-golang/sendtables"
 )
 
 var _ dem.IParser = new(Parser)

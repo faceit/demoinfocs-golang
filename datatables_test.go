@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/faceit/demoinfocs-golang/common"
-	"github.com/faceit/demoinfocs-golang/events"
-	st "github.com/faceit/demoinfocs-golang/sendtables"
-	fakest "github.com/faceit/demoinfocs-golang/sendtables/fake"
+	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/events"
+	st "github.com/markus-wa/demoinfocs-golang/sendtables"
+	fakest "github.com/markus-wa/demoinfocs-golang/sendtables/fake"
 )
 
 type DevNullReader struct {

@@ -6,9 +6,9 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	assert "github.com/stretchr/testify/assert"
 
-	common "github.com/faceit/demoinfocs-golang/common"
-	events "github.com/faceit/demoinfocs-golang/events"
-	msg "github.com/faceit/demoinfocs-golang/msg"
+	common "github.com/markus-wa/demoinfocs-golang/common"
+	events "github.com/markus-wa/demoinfocs-golang/events"
+	msg "github.com/markus-wa/demoinfocs-golang/msg"
 )
 
 func Test_UserMessages_ServerRankUpdate(t *testing.T) {

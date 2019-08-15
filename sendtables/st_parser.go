@@ -7,8 +7,8 @@ import (
 
 	proto "github.com/gogo/protobuf/proto"
 
-	bit "github.com/faceit/demoinfocs-golang/bitread"
-	msg "github.com/faceit/demoinfocs-golang/msg"
+	bit "github.com/markus-wa/demoinfocs-golang/bitread"
+	msg "github.com/markus-wa/demoinfocs-golang/msg"
 )
 
 // SendTableParser provides functions for parsing send-tables.

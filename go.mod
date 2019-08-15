@@ -1,4 +1,4 @@
-module github.com/faceit/demoinfocs-golang
+module github.com/markus-wa/demoinfocs-golang
 
 require (
 	github.com/dustin/go-heatmap v0.0.0-20180603032536-b89dbd73785a

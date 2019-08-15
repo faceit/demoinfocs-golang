@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	dem "github.com/faceit/demoinfocs-golang"
-	"github.com/faceit/demoinfocs-golang/common"
-	ex "github.com/faceit/demoinfocs-golang/examples"
-	"io/ioutil"
 	"os"
+
+	dem "github.com/markus-wa/demoinfocs-golang"
+	common "github.com/markus-wa/demoinfocs-golang/common"
+	events "github.com/markus-wa/demoinfocs-golang/events"
+	ex "github.com/markus-wa/demoinfocs-golang/examples"
 )
 
 // Run like this: go run print_events.go -demo /path/to/demo.dem
@@ -16,23 +16,52 @@ func main() {
 	defer f.Close()
 	checkError(err)
 
-	var buf bytes.Buffer
-	mr := common.NewStoppableReader(f, &buf)
-	mr.Begin()
-
-	p := dem.NewParser(mr)
+	p := dem.NewParser(f)
 
 	// Parse header
 	header, err := p.ParseHeader()
 	checkError(err)
 	fmt.Println("Map:", header.MapName)
 
+	// Register handler on kill events
+	p.RegisterEventHandler(func(e events.Kill) {
+		var hs string
+		if e.IsHeadshot {
+			hs = " (HS)"
+		}
+		var wallBang string
+		if e.PenetratedObjects > 0 {
+			wallBang = " (WB)"
+		}
+		fmt.Printf("%s <%v%s%s> %s\n", formatPlayer(e.Killer), e.Weapon.Weapon, hs, wallBang, formatPlayer(e.Victim))
+	})
+
+	// Register handler on round end to figure out who won
+	p.RegisterEventHandler(func(e events.RoundEnd) {
+		gs := p.GameState()
+		switch e.Winner {
+		case common.TeamTerrorists:
+			// Winner's score + 1 because it hasn't actually been updated yet
+			fmt.Printf("Round finished: winnerSide=T  ; score=%d:%d\n", gs.TeamTerrorists().Score+1, gs.TeamCounterTerrorists().Score)
+		case common.TeamCounterTerrorists:
+			fmt.Printf("Round finished: winnerSide=CT ; score=%d:%d\n", gs.TeamCounterTerrorists().Score+1, gs.TeamTerrorists().Score)
+		default:
+			// Probably match medic or something similar
+			fmt.Println("Round finished: No winner (tie)")
+		}
+	})
+
+	// Register handler for chat messages to print them
+	p.RegisterEventHandler(func(e events.ChatMessage) {
+		fmt.Printf("Chat - %s says: %s\n", formatPlayer(e.Sender), e.Text)
+	})
+
+	p.RegisterEventHandler(func(e events.RankUpdate) {
+		fmt.Printf("Rank Update: %d went from rank %d to rank %d, change: %f\n", e.SteamID, e.RankOld, e.RankNew, e.RankChange)
+	})
+
 	// Parse to end
 	err = p.ParseToEnd()
-	checkError(err)
-
-	fmt.Printf("got %d bytes", buf.Len())
-	err = ioutil.WriteFile("../../cs-demos/round.dem", buf.Bytes(), 777)
 	checkError(err)
 }
 

@@ -1,6 +1,7 @@
 package demoinfocs
 
 import (
+	"io"
 	"sync"
 	"time"
 
@@ -8,10 +9,10 @@ import (
 	"github.com/golang/geo/r3"
 	dp "github.com/markus-wa/godispatch"
 
-	bit "github.com/faceit/demoinfocs-golang/bitread"
-	"github.com/faceit/demoinfocs-golang/common"
-	"github.com/faceit/demoinfocs-golang/msg"
-	st "github.com/faceit/demoinfocs-golang/sendtables"
+	bit "github.com/markus-wa/demoinfocs-golang/bitread"
+	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/msg"
+	st "github.com/markus-wa/demoinfocs-golang/sendtables"
 )
 
 //go:generate ifacemaker -f parser.go -f parsing.go -s Parser -i IParser -p demoinfocs -D -y "IParser is an auto-generated interface for Parser, intended to be used when mockability is needed." -c "DO NOT EDIT: Auto generated" -o parser_interface.go
@@ -75,14 +76,6 @@ type Parser struct {
 	delayedEvents        []interface{}                                   // Contains events that need to be dispatched at the end of a tick (e.g. flash events because FlashDuration isn't updated before that)
 }
 
-func (p *Parser) BeginWriting() {
-	p.underlying.Begin()
-}
-
-func (p *Parser) StopWriting() {
-	p.underlying.End()
-}
-
 // NetMessageCreator creates additional net-messages to be dispatched to net-message handlers.
 //
 // See also: ParserConfig.AdditionalNetMessageCreators & Parser.RegisterNetMessageHandler()
@@ -102,6 +95,18 @@ func (bbi boundingBoxInformation) contains(point r3.Vector) bool {
 	return point.X >= bbi.min.X && point.X <= bbi.max.X &&
 		point.Y >= bbi.min.Y && point.Y <= bbi.max.Y &&
 		point.Z >= bbi.min.Z && point.Z <= bbi.max.Z
+}
+
+func (p *Parser) BeginCapture() {
+	if p.underlying != nil {
+		p.underlying.Begin()
+	}
+}
+
+func (p *Parser) EndCapture() {
+	if p.underlying != nil {
+		p.underlying.End()
+	}
 }
 
 // ServerClasses returns the server-classes of this demo.
@@ -207,12 +212,13 @@ func (p *Parser) setError(err error) {
 // The demostream io.Reader (e.g. os.File or bytes.Reader) must provide demo data in the '.DEM' format.
 //
 // See also: NewCustomParser() & DefaultParserConfig
-func NewParser(demostream common.StoppableReader) *Parser {
+func NewParser(demostream io.Reader) *Parser {
 	return NewParserWithConfig(demostream, DefaultParserConfig)
 }
 
 // ParserConfig contains the configuration for creating a new Parser.
 type ParserConfig struct {
+	CaptureSource io.Writer
 	// MsgQueueBufferSize defines the size of the internal net-message queue.
 	// For large demos, fast i/o and slow CPUs higher numbers are suggested and vice versa.
 	// The buffer size can easily be in the hundred-thousands to low millions for the best performance.
@@ -238,12 +244,17 @@ var DefaultParserConfig = ParserConfig{
 // NewParserWithConfig returns a new Parser with a custom configuration.
 //
 // See also: NewParser() & ParserConfig
-func NewParserWithConfig(demostream common.StoppableReader, config ParserConfig) *Parser {
+func NewParserWithConfig(demostream io.Reader, config ParserConfig) *Parser {
 	var p Parser
 
 	// Init parser
-	p.underlying = demostream
-	p.bitReader = bit.NewLargeBitReader(demostream)
+	underlying := demostream
+	if config.CaptureSource != nil {
+		p.underlying = common.NewStoppableReader(demostream, config.CaptureSource)
+		underlying = p.underlying
+	}
+
+	p.bitReader = bit.NewLargeBitReader(underlying)
 	p.stParser = st.NewSendTableParser()
 	p.equipmentMapping = make(map[*st.ServerClass]common.EquipmentElement)
 	p.rawPlayers = make(map[int]*playerInfo)

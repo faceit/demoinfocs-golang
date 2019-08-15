@@ -6,9 +6,9 @@ import (
 
 	"github.com/golang/geo/r3"
 
-	"github.com/faceit/demoinfocs-golang/common"
-	"github.com/faceit/demoinfocs-golang/events"
-	"github.com/faceit/demoinfocs-golang/msg"
+	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/events"
+	"github.com/markus-wa/demoinfocs-golang/msg"
 )
 
 func (p *Parser) handleGameEventList(gel *msg.CSVCMsg_GameEventList) {
@@ -159,7 +159,7 @@ func (geh gameEventHandler) roundAnnounceLastRoundHalf(desc *msg.CSVCMsg_GameEve
 func (geh gameEventHandler) roundEnd(desc *msg.CSVCMsg_GameEventListDescriptorT, ge *msg.CSVCMsg_GameEvent) {
 	data := mapGameEventData(desc, ge)
 
-	geh.parser.StopWriting()
+	geh.parser.EndCapture()
 
 	winner := common.Team(data["winner"].ValByte)
 	winnerState := geh.gameState().Team(winner)

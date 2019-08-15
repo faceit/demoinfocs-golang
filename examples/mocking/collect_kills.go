@@ -1,8 +1,8 @@
 package mocking
 
 import (
-	dem "github.com/faceit/demoinfocs-golang"
-	events "github.com/faceit/demoinfocs-golang/events"
+	dem "github.com/markus-wa/demoinfocs-golang"
+	events "github.com/markus-wa/demoinfocs-golang/events"
 )
 
 func collectKills(parser dem.IParser) (kills []events.Kill, err error) {

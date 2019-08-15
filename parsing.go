@@ -9,9 +9,9 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/faceit/demoinfocs-golang/common"
-	"github.com/faceit/demoinfocs-golang/events"
-	"github.com/faceit/demoinfocs-golang/msg"
+	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/events"
+	"github.com/markus-wa/demoinfocs-golang/msg"
 )
 
 const maxOsPath = 260
@@ -328,7 +328,7 @@ func (p *Parser) parsePacket() {
 			if e.GetEventid() == 43 {
 				fmt.Printf("round end at tick %d", p.gameState.IngameTick())
 				fmt.Println()
-				p.StopWriting()
+				p.EndCapture()
 			}
 		}
 

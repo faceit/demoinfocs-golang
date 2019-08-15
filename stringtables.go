@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	bit "github.com/faceit/demoinfocs-golang/bitread"
-	common "github.com/faceit/demoinfocs-golang/common"
-	events "github.com/faceit/demoinfocs-golang/events"
-	msg "github.com/faceit/demoinfocs-golang/msg"
+	bit "github.com/markus-wa/demoinfocs-golang/bitread"
+	common "github.com/markus-wa/demoinfocs-golang/common"
+	events "github.com/markus-wa/demoinfocs-golang/events"
+	msg "github.com/markus-wa/demoinfocs-golang/msg"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	dem "github.com/faceit/demoinfocs-golang"
-	"github.com/faceit/demoinfocs-golang/events"
+	dem "github.com/markus-wa/demoinfocs-golang"
+	"github.com/markus-wa/demoinfocs-golang/events"
 )
 
 /*

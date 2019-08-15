@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/faceit/demoinfocs-golang/sendtables"
-	"github.com/faceit/demoinfocs-golang/sendtables/fake"
+	"github.com/markus-wa/demoinfocs-golang/sendtables"
+	"github.com/markus-wa/demoinfocs-golang/sendtables/fake"
 )
 
 func TestPlayerActiveWeapon(t *testing.T) {

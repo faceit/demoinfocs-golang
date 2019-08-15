@@ -4,8 +4,8 @@ import (
 	"github.com/golang/geo/r3"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/faceit/demoinfocs-golang/bitread"
-	st "github.com/faceit/demoinfocs-golang/sendtables"
+	"github.com/markus-wa/demoinfocs-golang/bitread"
+	st "github.com/markus-wa/demoinfocs-golang/sendtables"
 )
 
 var _ st.IEntity = new(Entity)
