@@ -240,6 +240,7 @@ func (p *Parser) parseFrame() bool {
 
 	// Queue up some post processing
 	p.msgQueue <- frameParsedToken
+	p.currentFrame++
 
 	return true
 }
@@ -326,7 +327,7 @@ func (p *Parser) parsePacket() {
 		switch e := m.(type) {
 		case *msg.CSVCMsg_GameEvent:
 			if e.GetEventid() == 43 {
-				fmt.Printf("round end at tick %d", p.gameState.IngameTick())
+				fmt.Printf("round %d end at %s", p.gameState.totalRoundsPlayed, p.CurrentTime())
 				fmt.Println()
 				p.EndCapture()
 			}
@@ -354,8 +355,6 @@ func (p *Parser) handleFrameParsed(*frameParsedTokenType) {
 		p.eventDispatcher.Dispatch(e)
 	}
 	p.delayedEvents = p.delayedEvents[:0]
-
-	p.currentFrame++
 	p.eventDispatcher.Dispatch(events.TickDone{})
 	p.eventDispatcher.Dispatch(events.FrameDone{})
 }
