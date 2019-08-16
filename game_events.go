@@ -159,8 +159,6 @@ func (geh gameEventHandler) roundAnnounceLastRoundHalf(desc *msg.CSVCMsg_GameEve
 func (geh gameEventHandler) roundEnd(desc *msg.CSVCMsg_GameEventListDescriptorT, ge *msg.CSVCMsg_GameEvent) {
 	data := mapGameEventData(desc, ge)
 
-	geh.parser.EndCapture()
-
 	winner := common.Team(data["winner"].ValByte)
 	winnerState := geh.gameState().Team(winner)
 	var loserState *common.TeamState

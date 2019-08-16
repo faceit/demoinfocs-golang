@@ -1,7 +1,9 @@
 package demoinfocs
 
 import (
+	"bytes"
 	"io"
+	"io/ioutil"
 	"sync"
 	"time"
 
@@ -43,7 +45,7 @@ Prints out '{A/B} site went BOOM!' when a bomb explodes.
 type Parser struct {
 	// Important fields
 
-	underlying                   common.StoppableReader
+	sync                         bool
 	bitReader                    *bit.BitReader
 	stParser                     *st.SendTableParser
 	additionalNetMessageCreators map[int]NetMessageCreator // Map of net-message-IDs to NetMessageCreators (for parsing custom net-messages)
@@ -95,18 +97,6 @@ func (bbi boundingBoxInformation) contains(point r3.Vector) bool {
 	return point.X >= bbi.min.X && point.X <= bbi.max.X &&
 		point.Y >= bbi.min.Y && point.Y <= bbi.max.Y &&
 		point.Z >= bbi.min.Z && point.Z <= bbi.max.Z
-}
-
-func (p *Parser) BeginCapture() {
-	if p.underlying != nil {
-		p.underlying.Begin()
-	}
-}
-
-func (p *Parser) EndCapture() {
-	if p.underlying != nil {
-		p.underlying.End()
-	}
 }
 
 // ServerClasses returns the server-classes of this demo.
@@ -218,7 +208,6 @@ func NewParser(demostream io.Reader) *Parser {
 
 // ParserConfig contains the configuration for creating a new Parser.
 type ParserConfig struct {
-	CaptureSource io.Writer
 	// MsgQueueBufferSize defines the size of the internal net-message queue.
 	// For large demos, fast i/o and slow CPUs higher numbers are suggested and vice versa.
 	// The buffer size can easily be in the hundred-thousands to low millions for the best performance.
@@ -248,13 +237,7 @@ func NewParserWithConfig(demostream io.Reader, config ParserConfig) *Parser {
 	var p Parser
 
 	// Init parser
-	underlying := demostream
-	if config.CaptureSource != nil {
-		p.underlying = common.NewStoppableReader(demostream, config.CaptureSource)
-		underlying = p.underlying
-	}
-
-	p.bitReader = bit.NewLargeBitReader(underlying)
+	p.bitReader = bit.NewLargeBitReader(demostream)
 	p.stParser = st.NewSendTableParser()
 	p.equipmentMapping = make(map[*st.ServerClass]common.EquipmentElement)
 	p.rawPlayers = make(map[int]*playerInfo)
@@ -300,4 +283,39 @@ func (p demoInfoProvider) IngameTick() int {
 
 func (p demoInfoProvider) TickRate() float64 {
 	return p.parser.header.TickRate()
+}
+
+type CaptureParser struct {
+	*Parser
+	underlying common.StoppableReader
+	Out        *bytes.Buffer
+}
+
+func NewCaptureParser(stream io.Reader) *CaptureParser {
+	var buf bytes.Buffer
+	config := DefaultParserConfig
+	config.MsgQueueBufferSize = 0
+	rdr := common.NewStoppableReader(stream, &buf)
+	rdr.Begin()
+	return &CaptureParser{
+		Parser:     NewParserWithConfig(rdr, config),
+		Out:        &buf,
+		underlying: rdr,
+	}
+}
+
+func (p *CaptureParser) WriteOut(filename string) error {
+	return ioutil.WriteFile(filename, p.Out.Bytes(), 777)
+}
+
+func (p *CaptureParser) BeginCapture() {
+	if p.underlying != nil {
+		p.underlying.Begin()
+	}
+}
+
+func (p *CaptureParser) EndCapture() {
+	if p.underlying != nil {
+		p.underlying.End()
+	}
 }

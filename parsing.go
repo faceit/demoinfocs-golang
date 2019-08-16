@@ -240,7 +240,6 @@ func (p *Parser) parseFrame() bool {
 
 	// Queue up some post processing
 	p.msgQueue <- frameParsedToken
-	p.currentFrame++
 
 	return true
 }
@@ -323,16 +322,6 @@ func (p *Parser) parsePacket() {
 			// TODO: Don't crash here, happens with demos that work in gotv
 			panic(fmt.Sprintf("Failed to unmarshal cmd %d", cmd))
 		}
-
-		switch e := m.(type) {
-		case *msg.CSVCMsg_GameEvent:
-			if e.GetEventid() == 43 {
-				fmt.Printf("round %d end at %s", p.gameState.totalRoundsPlayed, p.CurrentTime())
-				fmt.Println()
-				p.EndCapture()
-			}
-		}
-
 		p.msgQueue <- m
 
 		// Reset length to 0 and pool
@@ -355,6 +344,8 @@ func (p *Parser) handleFrameParsed(*frameParsedTokenType) {
 		p.eventDispatcher.Dispatch(e)
 	}
 	p.delayedEvents = p.delayedEvents[:0]
+
+	p.currentFrame++
 	p.eventDispatcher.Dispatch(events.TickDone{})
 	p.eventDispatcher.Dispatch(events.FrameDone{})
 }

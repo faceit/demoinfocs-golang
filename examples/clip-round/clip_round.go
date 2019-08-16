@@ -1,54 +1,63 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	dem "github.com/markus-wa/demoinfocs-golang"
-	"github.com/markus-wa/demoinfocs-golang/common"
+	"github.com/markus-wa/demoinfocs-golang/events"
 	ex "github.com/markus-wa/demoinfocs-golang/examples"
-	"io/ioutil"
 	"os"
 )
 
 // Run like this: go run print_events.go -demo /path/to/demo.dem
 func main() {
 	f, err := os.Open(ex.DemoPathFromArgs())
-	defer f.Close()
 	checkError(err)
+	defer f.Close()
 
-	var buf bytes.Buffer
-	config := dem.DefaultParserConfig
-	config.CaptureSource = &buf
+	p := dem.NewCaptureParser(f)
+	startRound := 3
+	endRound := 5
 
-	p := dem.NewParser(f)
+	p.RegisterEventHandler(func(e events.MatchStart) {
+		p.EndCapture()
+	})
+
+	p.RegisterEventHandler(func(e events.RoundStart) {
+		ingameTime := p.CurrentTime()
+		progressPercent := p.Progress() * 100
+		round := p.GameState().TotalRoundsPlayed()
+
+		fmt.Printf("Round %d started: ingameTime=%s, progress=%f\n",
+			round, ingameTime, progressPercent)
+
+		if round == startRound {
+			p.BeginCapture()
+		}
+	})
+
+	p.RegisterEventHandler(func(e events.RoundEnd) {
+		ingameTime := p.CurrentTime()
+		progressPercent := p.Progress() * 100
+		round := p.GameState().TotalRoundsPlayed()
+
+		fmt.Printf("Round %d finished: ingameTime=%s, progress=%f\n",
+			round, ingameTime, progressPercent)
+
+		if round == endRound {
+			p.EndCapture()
+		}
+	})
 
 	// Parse header
-	p.BeginCapture()
 	header, err := p.ParseHeader()
 	checkError(err)
 	fmt.Println("Map:", header.MapName)
 
 	// Parse to end
-	err = p.ParseToEnd()
-	checkError(err)
+	checkError(p.ParseToEnd())
 
-	fmt.Printf("got %d bytes", buf.Len())
-	err = ioutil.WriteFile("../../cs-demos/round.dem", buf.Bytes(), 777)
-	checkError(err)
-}
-
-func formatPlayer(p *common.Player) string {
-	if p == nil {
-		return "?"
-	}
-
-	switch p.Team {
-	case common.TeamTerrorists:
-		return "[T]" + p.Name
-	case common.TeamCounterTerrorists:
-		return "[CT]" + p.Name
-	}
-	return p.Name
+	fmt.Printf("got %d bytes", p.Out.Len())
+	checkError(p.WriteOut("../../cs-demos/round.dem"))
 }
 
 func checkError(err error) {
