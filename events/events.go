@@ -157,6 +157,11 @@ type WeaponFire struct {
 	Weapon  *common.Equipment
 }
 
+// WeaponReload signals that a player started to reload his weapon.
+type WeaponReload struct {
+	Player *common.Player
+}
+
 // GrenadeEventIf is the interface for all GrenadeEvents (except GrenadeProjectile* events).
 // Used to catch the different events with the same handler.
 type GrenadeEventIf interface {
@@ -208,11 +213,15 @@ type SmokeExpired struct {
 }
 
 // FireGrenadeStart signals the start of a molly/incendiary.
+// GrenadeType will always be EqIncendiary as it's not networked whether it's an incendiary or molotov.
+// Thrower will always be nil as this isn't networked.
 type FireGrenadeStart struct {
 	GrenadeEvent
 }
 
 // FireGrenadeExpired signals that all fires of a molly/incendiary have extinguished.
+// GrenadeType will always be EqIncendiary as it's not networked whether it's an incendiary or molotov.
+// Thrower will always be nil as this isn't networked.
 type FireGrenadeExpired struct {
 	GrenadeEvent
 }
@@ -398,10 +407,10 @@ type ChatMessage struct {
 type RankUpdate struct {
 	SteamID    int64 // 32-bit SteamID. Deprecated, use SteamID32 instead
 	SteamID32  int32
+	RankChange float32
 	RankOld    int
 	RankNew    int
 	WinCount   int
-	RankChange float32
 }
 
 // ItemEquip signals an item was equipped.
@@ -526,4 +535,10 @@ type IsWarmupPeriodChanged struct {
 // PlayerSpottersChanged signals that a player's spotters (other players that can se him) changed.
 type PlayerSpottersChanged struct {
 	Spotted *common.Player
+}
+
+// ConVarsUpdated signals that ConVars/CVars have been updated.
+// See GameState.ConVars().
+type ConVarsUpdated struct {
+	UpdatedConVars map[string]string
 }

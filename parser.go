@@ -256,6 +256,7 @@ func NewParserWithConfig(demostream io.Reader, config ParserConfig) *Parser {
 	p.msgDispatcher.RegisterHandler(p.handleCreateStringTable)
 	p.msgDispatcher.RegisterHandler(p.handleUpdateStringTable)
 	p.msgDispatcher.RegisterHandler(p.handleUserMessage)
+	p.msgDispatcher.RegisterHandler(p.handleSetConVar)
 	p.msgDispatcher.RegisterHandler(p.handleFrameParsed)
 	p.msgDispatcher.RegisterHandler(p.gameState.handleIngameTickNumber)
 
@@ -283,6 +284,10 @@ func (p demoInfoProvider) IngameTick() int {
 
 func (p demoInfoProvider) TickRate() float64 {
 	return p.parser.header.TickRate()
+}
+
+func (p demoInfoProvider) FindPlayerByHandle(handle int) *common.Player {
+	return p.parser.gameState.Participants().FindByHandle(handle)
 }
 
 type CaptureParser struct {
