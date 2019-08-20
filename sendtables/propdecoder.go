@@ -81,7 +81,7 @@ type PropertyValue struct {
 
 type propertyDecoder struct{}
 
-func (propertyDecoder) decodeProp(prop *Property, reader *bit.BitReader) {
+func (propertyDecoder) decodeProp(prop *Property, reader bit.Reader) {
 	switch prop.entry.prop.rawType {
 	case propTypeFloat:
 		prop.value.FloatVal = propDecoder.decodeFloat(prop.entry.prop, reader)
@@ -106,7 +106,7 @@ func (propertyDecoder) decodeProp(prop *Property, reader *bit.BitReader) {
 	}
 }
 
-func (propertyDecoder) decodeInt(prop *sendTableProperty, reader *bit.BitReader) int {
+func (propertyDecoder) decodeInt(prop *sendTableProperty, reader bit.Reader) int {
 	if prop.flags.hasFlagSet(propFlagVarInt) {
 		if prop.flags.hasFlagSet(propFlagUnsigned) {
 			return int(reader.ReadVarInt32())
@@ -119,7 +119,7 @@ func (propertyDecoder) decodeInt(prop *sendTableProperty, reader *bit.BitReader)
 	return reader.ReadSignedInt(prop.numberOfBits)
 }
 
-func (propertyDecoder) decodeFloat(prop *sendTableProperty, reader *bit.BitReader) float32 {
+func (propertyDecoder) decodeFloat(prop *sendTableProperty, reader bit.Reader) float32 {
 	if prop.flags&specialFloatFlags != 0 {
 		return propDecoder.decodeSpecialFloat(prop, reader)
 	}
@@ -128,7 +128,7 @@ func (propertyDecoder) decodeFloat(prop *sendTableProperty, reader *bit.BitReade
 	return prop.lowValue + ((prop.highValue - prop.lowValue) * (float32(dwInterp) / float32((int(1)<<uint(prop.numberOfBits))-1)))
 }
 
-func (propertyDecoder) decodeSpecialFloat(prop *sendTableProperty, reader *bit.BitReader) float32 {
+func (propertyDecoder) decodeSpecialFloat(prop *sendTableProperty, reader bit.Reader) float32 {
 	// Because multiple flags can be set this order is fixed for now (priorities).
 	// TODO: Would be more efficient to first check the most common ones tho.
 	if prop.flags.hasFlagSet(propFlagCoord) {
@@ -153,7 +153,7 @@ func (propertyDecoder) decodeSpecialFloat(prop *sendTableProperty, reader *bit.B
 	panic(fmt.Sprintf("Unexpected special float flag (Flags %v)", prop.flags))
 }
 
-func (propertyDecoder) readBitCoord(reader *bit.BitReader) float32 {
+func (propertyDecoder) readBitCoord(reader bit.Reader) float32 {
 	var intVal, fractVal int
 	var res float32
 	isNegative := false
@@ -181,7 +181,7 @@ func (propertyDecoder) readBitCoord(reader *bit.BitReader) float32 {
 	return res
 }
 
-func (propertyDecoder) readBitCoordMp(reader *bit.BitReader, isIntegral bool, isLowPrecision bool) float32 {
+func (propertyDecoder) readBitCoordMp(reader bit.Reader, isIntegral bool, isLowPrecision bool) float32 {
 	var res float32
 	isNegative := false
 
@@ -221,7 +221,7 @@ func (propertyDecoder) readBitCoordMp(reader *bit.BitReader, isIntegral bool, is
 	return res
 }
 
-func (propertyDecoder) readBitNormal(reader *bit.BitReader) float32 {
+func (propertyDecoder) readBitNormal(reader bit.Reader) float32 {
 	isNegative := reader.ReadBit()
 
 	fractVal := reader.ReadInt(normalFractBits)
@@ -235,7 +235,7 @@ func (propertyDecoder) readBitNormal(reader *bit.BitReader) float32 {
 	return res
 }
 
-func (propertyDecoder) readBitCellCoord(reader *bit.BitReader, bits int, isIntegral bool, isLowPrecision bool) float32 {
+func (propertyDecoder) readBitCellCoord(reader bit.Reader, bits int, isIntegral bool, isLowPrecision bool) float32 {
 	var intVal, fractVal int
 	var res float32
 
@@ -257,7 +257,7 @@ func (propertyDecoder) readBitCellCoord(reader *bit.BitReader, bits int, isInteg
 	return res
 }
 
-func (propertyDecoder) decodeVector(prop *sendTableProperty, reader *bit.BitReader) r3.Vector {
+func (propertyDecoder) decodeVector(prop *sendTableProperty, reader bit.Reader) r3.Vector {
 	res := r3.Vector{
 		X: float64(propDecoder.decodeFloat(prop, reader)),
 		Y: float64(propDecoder.decodeFloat(prop, reader)),
@@ -281,7 +281,7 @@ func (propertyDecoder) decodeVector(prop *sendTableProperty, reader *bit.BitRead
 	return res
 }
 
-func (propertyDecoder) decodeArray(fProp *flattenedPropEntry, reader *bit.BitReader) []PropertyValue {
+func (propertyDecoder) decodeArray(fProp *flattenedPropEntry, reader bit.Reader) []PropertyValue {
 	numBits := int(math.Floor(math.Log2(float64(fProp.prop.numberOfElements))) + 1)
 
 	res := make([]PropertyValue, int(reader.ReadInt(numBits)))
@@ -298,7 +298,7 @@ func (propertyDecoder) decodeArray(fProp *flattenedPropEntry, reader *bit.BitRea
 	return res
 }
 
-func (propertyDecoder) decodeString(reader *bit.BitReader) string {
+func (propertyDecoder) decodeString(reader bit.Reader) string {
 	length := int(reader.ReadInt(dataTableMaxStringBits))
 	if length > dataTableMaxStringLength {
 		length = dataTableMaxStringLength
@@ -306,7 +306,7 @@ func (propertyDecoder) decodeString(reader *bit.BitReader) string {
 	return reader.ReadCString(length)
 }
 
-func (propertyDecoder) decodeVectorXY(prop *sendTableProperty, reader *bit.BitReader) r3.Vector {
+func (propertyDecoder) decodeVectorXY(prop *sendTableProperty, reader bit.Reader) r3.Vector {
 	return r3.Vector{
 		X: float64(propDecoder.decodeFloat(prop, reader)),
 		Y: float64(propDecoder.decodeFloat(prop, reader)),

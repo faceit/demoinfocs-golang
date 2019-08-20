@@ -73,7 +73,7 @@ func (p *SendTableParser) ServerClasses() ServerClasses {
 // ParsePacket parses a send-table packet.
 //
 // Intended for internal use only.
-func (p *SendTableParser) ParsePacket(r *bit.BitReader) {
+func (p *SendTableParser) ParsePacket(r bit.Reader) {
 	for {
 		t := msg.SVC_Messages(r.ReadVarInt32())
 		if t != msg.SVC_Messages_svc_SendTable {
@@ -113,7 +113,7 @@ func (p *SendTableParser) ParsePacket(r *bit.BitReader) {
 	}
 }
 
-func parseSendTable(r *bit.BitReader) sendTable {
+func parseSendTable(r bit.Reader) sendTable {
 	size := int(r.ReadVarInt32())
 	r.BeginChunk(size << 3)
 	st := new(msg.CSVCMsg_SendTable)
@@ -283,7 +283,7 @@ func (p *SendTableParser) SetInstanceBaseline(scID int, data []byte) {
 // ReadEnterPVS reads an entity entering the PVS (potentially visible system).
 //
 // Intended for internal use only.
-func (p *SendTableParser) ReadEnterPVS(r *bit.BitReader, entityID int) *Entity {
+func (p *SendTableParser) ReadEnterPVS(r bit.Reader, entityID int) *Entity {
 	scID := int(r.ReadInt(p.classBits()))
 	r.Skip(10) // Serial Number
 

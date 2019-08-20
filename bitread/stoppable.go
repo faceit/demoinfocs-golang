@@ -1,8 +1,9 @@
-package common
+package bitread
 
 import (
 	"fmt"
 	"io"
+	"time"
 )
 
 // TeeReader returns a Reader that writes to w what it reads from r.
@@ -29,6 +30,7 @@ type teeReader struct {
 func (t *teeReader) Read(p []byte) (n int, err error) {
 	n, err = t.r.Read(p)
 	if n > 0 && t.read {
+		fmt.Printf("reading at %s\n", time.Now())
 		if n, err := t.w.Write(p[:n]); err != nil {
 			return n, err
 		}
@@ -38,14 +40,14 @@ func (t *teeReader) Read(p []byte) (n int, err error) {
 
 func (t *teeReader) Begin() {
 	if !t.read {
-		fmt.Println("started reading")
+		fmt.Printf("started reading at %s\n", time.Now())
 	}
 	t.read = true
 }
 
 func (t *teeReader) End() {
 	if t.read {
-		fmt.Println("stopped reading")
+		fmt.Printf("stopped reading at %s\n", time.Now())
 	}
 	t.read = false
 }

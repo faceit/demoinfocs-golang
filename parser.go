@@ -1,9 +1,7 @@
 package demoinfocs
 
 import (
-	"bytes"
 	"io"
-	"io/ioutil"
 	"sync"
 	"time"
 
@@ -44,9 +42,8 @@ Prints out '{A/B} site went BOOM!' when a bomb explodes.
 */
 type Parser struct {
 	// Important fields
-
-	sync                         bool
-	bitReader                    *bit.BitReader
+	Read                         bool
+	bitReader                    bit.Reader
 	stParser                     *st.SendTableParser
 	additionalNetMessageCreators map[int]NetMessageCreator // Map of net-message-IDs to NetMessageCreators (for parsing custom net-messages)
 	msgQueue                     chan interface{}          // Queue of net-messages
@@ -292,35 +289,55 @@ func (p demoInfoProvider) FindPlayerByHandle(handle int) *common.Player {
 
 type CaptureParser struct {
 	*Parser
-	underlying common.StoppableReader
-	Out        *bytes.Buffer
+	rdr *bit.CaptureReader
 }
 
 func NewCaptureParser(stream io.Reader) *CaptureParser {
-	var buf bytes.Buffer
-	config := DefaultParserConfig
-	config.MsgQueueBufferSize = 0
-	rdr := common.NewStoppableReader(stream, &buf)
-	rdr.Begin()
+	rdr := bit.NewCaptureBitReader(stream)
 	return &CaptureParser{
-		Parser:     NewParserWithConfig(rdr, config),
-		Out:        &buf,
-		underlying: rdr,
+		Parser: newCaptureParser(rdr),
+		rdr:    rdr,
 	}
 }
 
-func (p *CaptureParser) WriteOut(filename string) error {
-	return ioutil.WriteFile(filename, p.Out.Bytes(), 777)
+func newCaptureParser(demostream *bit.CaptureReader) *Parser {
+	var p Parser
+
+	// Init parser
+	p.bitReader = demostream
+	p.stParser = st.NewSendTableParser()
+	p.equipmentMapping = make(map[*st.ServerClass]common.EquipmentElement)
+	p.rawPlayers = make(map[int]*playerInfo)
+	p.triggers = make(map[int]*boundingBoxInformation)
+	p.cancelChan = make(chan struct{}, 1)
+	p.gameState = newGameState()
+	p.grenadeModelIndices = make(map[int]common.EquipmentElement)
+	p.gameEventHandler = newGameEventHandler(&p)
+	p.userMessageHandler = newUserMessageHandler(&p)
+	p.demoInfoProvider = demoInfoProvider{parser: &p}
+
+	// Attach proto msg handlers
+	p.msgDispatcher.RegisterHandler(p.handlePacketEntities)
+	p.msgDispatcher.RegisterHandler(p.handleGameEventList)
+	p.msgDispatcher.RegisterHandler(p.handleGameEvent)
+	p.msgDispatcher.RegisterHandler(p.handleCreateStringTable)
+	p.msgDispatcher.RegisterHandler(p.handleUpdateStringTable)
+	p.msgDispatcher.RegisterHandler(p.handleUserMessage)
+	p.msgDispatcher.RegisterHandler(p.handleSetConVar)
+	p.msgDispatcher.RegisterHandler(p.handleFrameParsed)
+	p.msgDispatcher.RegisterHandler(p.gameState.handleIngameTickNumber)
+
+	return &p
 }
 
 func (p *CaptureParser) BeginCapture() {
-	if p.underlying != nil {
-		p.underlying.Begin()
-	}
+	p.rdr.BeginCapture()
 }
 
 func (p *CaptureParser) EndCapture() {
-	if p.underlying != nil {
-		p.underlying.End()
-	}
+	p.rdr.EndCapture()
+}
+
+func (p *CaptureParser) WriteOut(filename string) error {
+	return p.rdr.WriteOut(filename)
 }

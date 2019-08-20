@@ -91,7 +91,7 @@ var updatedPropIndicesPool = sync.Pool{
 // triggers registered PropertyUpdateHandlers if values changed.
 //
 // Intended for internal use only.
-func (e *Entity) ApplyUpdate(reader *bit.BitReader) {
+func (e *Entity) ApplyUpdate(reader bit.Reader) {
 	idx := -1
 	newWay := reader.ReadBit()
 	updatedPropIndices := updatedPropIndicesPool.Get().(*[]int)
@@ -117,7 +117,7 @@ func (e *Entity) ApplyUpdate(reader *bit.BitReader) {
 	updatedPropIndicesPool.Put(updatedPropIndices)
 }
 
-func readFieldIndex(reader *bit.BitReader, lastIndex int, newWay bool) int {
+func readFieldIndex(reader bit.Reader, lastIndex int, newWay bool) int {
 	if newWay && reader.ReadBit() {
 		// NewWay A
 		return lastIndex + 1
@@ -147,7 +147,7 @@ func readFieldIndex(reader *bit.BitReader, lastIndex int, newWay bool) int {
 }
 
 // Collects an initial baseline for a server-class
-func (e *Entity) initializeBaseline(r *bit.BitReader) map[int]PropertyValue {
+func (e *Entity) initializeBaseline(r bit.Reader) map[int]PropertyValue {
 	baseline := make(map[int]PropertyValue)
 	for i := range e.props {
 		i2 := i // Copy for the adder

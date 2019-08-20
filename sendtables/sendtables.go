@@ -92,7 +92,7 @@ func (sc *ServerClass) PropertyEntries() []string {
 	return names
 }
 
-func (sc *ServerClass) newEntity(entityDataReader *bit.BitReader, entityID int) *Entity {
+func (sc *ServerClass) newEntity(entityDataReader bit.Reader, entityID int) *Entity {
 	propCount := len(sc.flattenedProps)
 	props := make([]Property, propCount)
 	for i := range sc.flattenedProps {

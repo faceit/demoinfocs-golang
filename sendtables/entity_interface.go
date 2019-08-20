@@ -34,7 +34,7 @@ type IEntity interface {
 	// triggers registered PropertyUpdateHandlers if values changed.
 	//
 	// Intended for internal use only.
-	ApplyUpdate(reader *bit.BitReader)
+	ApplyUpdate(reader bit.Reader)
 	// Position returns the entity's position in world coordinates.
 	Position() r3.Vector
 	// OnPositionUpdate registers a handler for the entity's position update.

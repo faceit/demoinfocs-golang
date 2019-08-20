@@ -111,12 +111,12 @@ var smallBufferPool = sync.Pool{
 }
 
 // NewSmallBitReader returns a BitReader with a small buffer, suitable for short streams.
-func NewSmallBitReader(underlying io.Reader) *BitReader {
+func NewSmallBitReader(underlying io.Reader) Reader {
 	return newBitReader(underlying, smallBufferPool.Get().(*[]byte))
 }
 
 // NewLargeBitReader returns a BitReader with a large buffer, suitable for long streams (main demo file).
-func NewLargeBitReader(underlying io.Reader) *BitReader {
+func NewLargeBitReader(underlying io.Reader) Reader {
 	b := make([]byte, largeBuffer)
 	return newBitReader(underlying, &b)
 }
