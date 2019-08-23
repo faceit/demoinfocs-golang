@@ -7,8 +7,6 @@ import (
 	"io"
 	"math"
 	"sync"
-
-	bitread "github.com/markus-wa/gobitread"
 )
 
 const (
@@ -19,7 +17,7 @@ const (
 
 // BitReader wraps github.com/markus-wa/gobitread.BitReader and provides additional functionality specific to CS:GO demos.
 type BitReader struct {
-	bitread.BitReader
+	BasicReader
 	buffer *[]byte
 }
 

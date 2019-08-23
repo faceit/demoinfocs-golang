@@ -289,14 +289,14 @@ func (p demoInfoProvider) FindPlayerByHandle(handle int) *common.Player {
 
 type CaptureParser struct {
 	*Parser
-	rdr *bit.CaptureReader
+	reader *bit.CaptureReader
 }
 
 func NewCaptureParser(stream io.Reader) *CaptureParser {
-	rdr := bit.NewCaptureBitReader(stream)
+	reader := bit.NewCaptureBitReader(stream)
 	return &CaptureParser{
-		Parser: newCaptureParser(rdr),
-		rdr:    rdr,
+		Parser: newCaptureParser(reader),
+		reader: reader,
 	}
 }
 
@@ -331,13 +331,13 @@ func newCaptureParser(demostream *bit.CaptureReader) *Parser {
 }
 
 func (p *CaptureParser) BeginCapture() {
-	p.rdr.BeginCapture()
+	p.reader.BeginCapture()
 }
 
 func (p *CaptureParser) EndCapture() {
-	p.rdr.EndCapture()
+	p.reader.EndCapture()
 }
 
 func (p *CaptureParser) WriteOut(filename string) error {
-	return p.rdr.WriteOut(filename)
+	return p.reader.WriteOut(filename)
 }

@@ -18,6 +18,7 @@ func NewStoppableReader(r io.Reader, w io.Writer) StoppableReader {
 type StoppableReader interface {
 	io.Reader
 	Begin()
+	IsReading() bool
 	End()
 }
 
@@ -27,10 +28,13 @@ type teeReader struct {
 	read bool
 }
 
+func (t teeReader) IsReading() bool {
+	return t.read
+}
+
 func (t *teeReader) Read(p []byte) (n int, err error) {
 	n, err = t.r.Read(p)
 	if n > 0 && t.read {
-		fmt.Printf("reading at %s\n", time.Now())
 		if n, err := t.w.Write(p[:n]); err != nil {
 			return n, err
 		}

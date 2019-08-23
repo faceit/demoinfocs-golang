@@ -18,9 +18,11 @@ func main() {
 
 	p.RegisterEventHandler(func(e interface{}) {
 		round := p.GameState().TotalRoundsPlayed()
-		switch e.(type) {
+		switch event := e.(type) {
 		case events.FrameDone, events.TickDone:
 			break
+		case events.ParserWarn:
+			fmt.Printf("Round %d Parser Warn: %s\n", round, event.Message)
 		default:
 			fmt.Printf("Round %d %T\n", round, e)
 		}

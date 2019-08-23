@@ -11,7 +11,7 @@ func TestScores(t *testing.T) {
 		t.Skip("skipping test")
 	}
 
-	os.Args = []string{"cmd", "-demo", "../../cs-demos/test/out-2019-08-20T14:54:01+01:00.dem"}
+	os.Args = []string{"cmd", "-demo", "../../cs-demos/cut-at-data-tables-parsed.dem"}
 
 	main()
 }

@@ -17,20 +17,14 @@ func main() {
 
 	cp := dem.NewCaptureParser(f)
 
-	cp.RegisterEventHandler(func(e events.RoundStart) {
-		round := cp.GameState().TotalRoundsPlayed()
-		if round == 0 {
-			cp.EndCapture()
-		}
+	cp.RegisterEventHandler(func(e events.DataTablesParsed) {
+		cp.EndCapture()
 	})
 
 	cp.RegisterEventHandler(func(e events.RoundEndOfficial) {
 		ingameTime := cp.CurrentTime()
-		progressPercent := cp.Progress() * 100
 		round := cp.GameState().TotalRoundsPlayed()
-
-		fmt.Printf("Round %d finished: ingameTime=%s, progress=%f\n",
-			round, ingameTime, progressPercent)
+		fmt.Printf("Round %d ingameTime=%s\n", round, ingameTime)
 
 		clipRound(cp, round)
 	})
@@ -52,12 +46,25 @@ func main() {
 
 	p := dem.NewParser(f)
 
-	p.RegisterEventHandler(func(e events.RoundEndOfficial) {
+	p.RegisterEventHandler(func(e interface{}) {
+		round := p.GameState().TotalRoundsPlayed()
+		switch event := e.(type) {
+		case events.FrameDone, events.TickDone:
+			break
+		case events.ParserWarn:
+			fmt.Printf("Round %d Parser Warn: %s\n", round, event.Message)
+		default:
+			fmt.Printf("Round %d %T\n", round, e)
+		}
+
+	})
+
+	p.RegisterEventHandler(func(e events.RoundStart) {
 		ingameTime := p.CurrentTime()
 		progressPercent := p.Progress() * 100
 		round := p.GameState().TotalRoundsPlayed()
 
-		fmt.Printf("Round %d finished: ingameTime=%s, progress=%f\n",
+		fmt.Printf("Round %d started: ingameTime=%s, progress=%f\n",
 			round, ingameTime, progressPercent)
 	})
 
@@ -71,8 +78,8 @@ func main() {
 }
 
 func clipRound(cp *dem.CaptureParser, round int) {
-	startRound := 20
-	endRound := 22
+	startRound := 2
+	endRound := 2
 
 	if round == startRound-1 {
 		cp.BeginCapture()
