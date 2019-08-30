@@ -17,7 +17,7 @@ type BasicReader struct {
 	offset       int
 	bitsInBuffer int
 	lazyPosition int
-	chunkTargets stack
+	ChunkTargets stack
 	endReached   bool
 }
 
@@ -71,7 +71,7 @@ func (r *BasicReader) Close() {
 	r.Buffer = nil
 	r.offset = 0
 	r.bitsInBuffer = 0
-	r.chunkTargets = stack{}
+	r.ChunkTargets = stack{}
 	r.lazyPosition = 0
 }
 
@@ -173,7 +173,7 @@ func (r *BasicReader) ReadSignedInt(n int) int {
 // BeginChunk starts a new chunk with n bits.
 // Useful to make sure the position in the bit stream is correct.
 func (r *BasicReader) BeginChunk(n int) {
-	r.chunkTargets = r.chunkTargets.push(r.ActualPosition() + n)
+	r.ChunkTargets = r.ChunkTargets.push(r.ActualPosition() + n)
 }
 
 // EndChunk attempts to 'end' the last chunk.
@@ -181,7 +181,7 @@ func (r *BasicReader) BeginChunk(n int) {
 // Panics if the chunk boundary was exceeded while reading.
 func (r *BasicReader) EndChunk() {
 	var target int
-	r.chunkTargets, target = r.chunkTargets.pop()
+	r.ChunkTargets, target = r.ChunkTargets.pop()
 	delta := target - r.ActualPosition()
 	if delta < 0 {
 		panic("Someone read beyond a chunk boundary, what a dick")
@@ -195,7 +195,7 @@ func (r *BasicReader) EndChunk() {
 
 // ChunkFinished returns true if the current position is at the end of the chunk.
 func (r *BasicReader) ChunkFinished() bool {
-	return r.chunkTargets.top() <= r.ActualPosition()
+	return r.ChunkTargets.top() <= r.ActualPosition()
 }
 
 // Skip skips n bits.

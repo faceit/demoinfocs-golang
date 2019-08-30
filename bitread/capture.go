@@ -21,25 +21,14 @@ func NewCaptureBitReader(underlying io.Reader) *CaptureReader {
 	rdr.Begin()
 	b := make([]byte, largeBuffer)
 	br := newBitReader(rdr, &b)
-	return &CaptureReader{BitReader: br, rdr: rdr, Out: &buf}
+	r := &CaptureReader{BitReader: br, rdr: rdr, Out: &buf}
+	r.startRead = true
+	return r
 }
 
 func (r *CaptureReader) BeginCapture() {
-	// TODO this method will be called as we are midway through reading from the buffer
-	// so we have to pickup everything that hasn't been read yet
 	r.stopRead = false
 	r.startRead = true
-}
-
-func (r *CaptureReader) BeginChunk(n int) {
-	offset := r.ActualPosition() - r.LazyPosition()
-	if r.startRead && !r.rdr.IsReading() && offset%8 == 0 {
-		fmt.Printf("begin capture with buf size %d\n", r.Out.Len())
-		r.Out.Write(r.Buffer[offset/8 : len(r.Buffer)-sled])
-		fmt.Printf("filled from buffer, size is now %d\n", r.Out.Len())
-		r.rdr.Begin()
-	}
-	r.BitReader.BeginChunk(n)
 }
 
 func (r *CaptureReader) WriteOut(filename string) error {
@@ -49,12 +38,20 @@ func (r *CaptureReader) WriteOut(filename string) error {
 func (r *CaptureReader) EndChunk() {
 	r.BitReader.EndChunk()
 	offset := r.ActualPosition() - r.LazyPosition()
-	if r.stopRead && r.rdr.IsReading() && r.ChunkFinished() &&
-		offset%8 == 0 {
+	atBoundary := offset%8 == 0 && len(r.ChunkTargets) == 0
+
+	if r.rdr.IsReading() && r.stopRead && atBoundary {
 		r.rdr.End()
-		toClear := largeBuffer - sled - (offset / 8)
+		toClear := largeBuffer - (offset / 8)
 		r.Out.Truncate(r.Out.Len() - toClear)
 		fmt.Printf("end capture with buf size %d\n", r.Out.Len())
+	}
+
+	if !r.rdr.IsReading() && r.startRead && atBoundary {
+		fmt.Printf("begin capture with buf size %d\n", r.Out.Len())
+		r.Out.Write(r.Buffer[offset/8:])
+		fmt.Printf("filled from buffer, size is now %d\n", r.Out.Len())
+		r.rdr.Begin()
 	}
 }
 

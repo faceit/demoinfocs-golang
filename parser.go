@@ -327,6 +327,8 @@ func newCaptureParser(demostream *bit.CaptureReader) *Parser {
 	p.msgDispatcher.RegisterHandler(p.handleFrameParsed)
 	p.msgDispatcher.RegisterHandler(p.gameState.handleIngameTickNumber)
 
+	p.initMsgQueue(0)
+
 	return &p
 }
 
